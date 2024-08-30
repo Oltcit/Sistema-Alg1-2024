@@ -1,0 +1,5 @@
+INDEX VERSION 1.131+C:\Colegios 2024\Algoritmos I\Sistema Alumno\.metadata\.plugins\org.eclipse.jdt.core
+2075788050.index
+3355957214.index
+2763551843.index
+1865797976.index
