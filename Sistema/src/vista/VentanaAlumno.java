@@ -2,19 +2,25 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import controlador.Coordinador;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import com.toedter.calendar.JDateChooser;
-import javax.swing.JCheckBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
+
+import controlador.Coordinador;
+import modelo.AlumnoDAO;
+import modelo.AlumnoVO;
 
 public class VentanaAlumno extends JFrame {
 
@@ -73,13 +79,18 @@ public class VentanaAlumno extends JFrame {
 		contentPane.add(panelSur, BorderLayout.SOUTH);
 		
 		btnGuardar = new JButton("Guardar");
+		btnGuardar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				guardarAlumno();
+			}
+		});
 		panelSur.add(btnGuardar);
 		
 		btnAgregar = new JButton("Agregar");
 		btnAgregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				accion = 1;
-				
+				habilita(true, true, true, true, true, false, false, false, false, true);
 			}
 		});
 		panelSur.add(btnAgregar);
@@ -94,6 +105,11 @@ public class VentanaAlumno extends JFrame {
 		panelSur.add(btnBuscar);
 		
 		btnCancelar = new JButton("Cancelar");
+		btnCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				limpiar();
+			}
+		});
 		panelSur.add(btnCancelar);
 		
 		JPanel panelCentro = new JPanel();
@@ -131,6 +147,45 @@ public class VentanaAlumno extends JFrame {
 		txtApe.setColumns(10);
 		
 		habilita(true, false, false, false, false, true, false, false, true, true);
+	}
+	protected void guardarAlumno() {
+		try {
+			Date date=selectorFecha.getDate();
+			SimpleDateFormat sdf= new SimpleDateFormat("yyyy-MM-dd");
+			AlumnoVO miAlumnoVO = new AlumnoVO();
+			miAlumnoVO.setDni(Integer.valueOf(txtDni.getText()));
+			miAlumnoVO.setApe(txtApe.getText());
+			miAlumnoVO.setFecha(sdf.format(date));
+			if (chkDoc.isSelected())
+				miAlumnoVO.setDoc((byte) 1);
+			else
+				miAlumnoVO.setDoc((byte) 0);
+			
+			if (accion==1){
+				//miCoordinador.registrarAlumno(miAlumno);
+				AlumnoDAO miAlumnoDAO= new AlumnoDAO();
+				
+				miAlumnoDAO.registrarAlumno(miAlumnoVO);
+				limpiar();
+			}else{
+				//miCoordinador.modificarAlumno(miAlumno);
+				limpiar();
+			}
+			
+		} catch (Exception e){
+			JOptionPane.showMessageDialog(null, "Error en el ingreso de datos","Error",JOptionPane.ERROR_MESSAGE);
+			limpiar();
+		}
+		
+	}
+
+	private void limpiar() {
+			txtDni.setText("");
+			txtApe.setText("");
+			selectorFecha.setCalendar(null);
+			chkDoc.setSelected(false);
+			
+			habilita(true, false, false, false, false, true, false, false, true, true);
 	}
 	public void habilita(boolean dni,boolean ape,boolean fecha,boolean doc,boolean bGuardar,boolean bAgregar,
 			boolean bModificar, boolean bEliminar, boolean bBuscar, boolean bCancelar) {
