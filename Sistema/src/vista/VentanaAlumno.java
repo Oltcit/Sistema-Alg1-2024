@@ -102,6 +102,11 @@ public class VentanaAlumno extends JFrame {
 		panelSur.add(btnEliminar);
 		
 		btnBuscar = new JButton("Buscar");
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				buscarAlumnos();
+			}
+		});
 		panelSur.add(btnBuscar);
 		
 		btnCancelar = new JButton("Cancelar");
@@ -148,6 +153,11 @@ public class VentanaAlumno extends JFrame {
 		
 		habilita(true, false, false, false, false, true, false, false, true, true);
 	}
+	protected void buscarAlumnos() {
+		miCoordinador.mostrarVentanaAlumnoBuscar();
+		
+	}
+
 	protected void guardarAlumno() {
 		try {
 			Date date=selectorFecha.getDate();
