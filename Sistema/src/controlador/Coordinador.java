@@ -1,5 +1,6 @@
 package controlador;
 
+import modelo.AlumnoVO;
 import vista.VentanaAlumno;
 import vista.VentanaAlumnoBuscar;
 import vista.VentanaPrincipal;
@@ -34,9 +35,13 @@ public class Coordinador {
 		miVentanaAlumno.setVisible(true);
 		
 	}
-	public void mostrarVentanaAlumnoBuscar() {
+	public void mostrarVentanaAlumnoBuscar(int dni) {
 		miVentanaAlumnoBuscar.setVisible(true);
-		miVentanaAlumnoBuscar.cargarDatos();
+		miVentanaAlumnoBuscar.cargarDatos(dni);
+	}
+	public void pasarDatosAlumno(AlumnoVO miAlumnoVO) {
+		miVentanaAlumno.mostrarDatos(miAlumnoVO);
+		
 	}
 	
 }

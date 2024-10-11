@@ -4,8 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -96,9 +98,19 @@ public class VentanaAlumno extends JFrame {
 		panelSur.add(btnAgregar);
 		
 		btnModificar = new JButton("Modificar");
+		btnModificar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				modificarAlumno();
+			}
+		});
 		panelSur.add(btnModificar);
 		
 		btnEliminar = new JButton("Eliminar");
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				eliminarAlumno();
+			}
+		});
 		panelSur.add(btnEliminar);
 		
 		btnBuscar = new JButton("Buscar");
@@ -130,7 +142,8 @@ public class VentanaAlumno extends JFrame {
 		panelCentro.add(lblNewLabel_1);
 		
 		selectorFecha = new JDateChooser();
-		selectorFecha.setBounds(159, 114, 70, 20);
+		selectorFecha.setDateFormatString("d/M/yyyy");
+		selectorFecha.setBounds(159, 114, 115, 20);
 		panelCentro.add(selectorFecha);
 		
 		JLabel lblNewLabel_2 = new JLabel("Fecha de nacimiento:");
@@ -153,8 +166,26 @@ public class VentanaAlumno extends JFrame {
 		
 		habilita(true, false, false, false, false, true, false, false, true, true);
 	}
+	protected void eliminarAlumno() {
+		int res = JOptionPane.showConfirmDialog(null, "Está seguro de eliminar ese Alumno?","Confirmación",JOptionPane.YES_NO_OPTION);
+		if (res == JOptionPane.YES_NO_OPTION) {
+			AlumnoDAO miAlumnoDAO = new AlumnoDAO();
+			miAlumnoDAO.eliminarAlumno(Integer.valueOf(txtDni.getText()));
+			limpiar();
+		}
+		
+	}
+
+	protected void modificarAlumno() {
+		accion=2;
+		habilita(false, true, true, true, true, false, false, false, false, true);
+	}
+
 	protected void buscarAlumnos() {
-		miCoordinador.mostrarVentanaAlumnoBuscar();
+		int dni=0;
+		if (!txtDni.getText().isEmpty())
+			dni = Integer.valueOf(txtDni.getText());
+		miCoordinador.mostrarVentanaAlumnoBuscar(dni);
 		
 	}
 
@@ -171,17 +202,14 @@ public class VentanaAlumno extends JFrame {
 			else
 				miAlumnoVO.setDoc((byte) 0);
 			
-			if (accion==1){
-				//miCoordinador.registrarAlumno(miAlumno);
-				AlumnoDAO miAlumnoDAO= new AlumnoDAO();
-				
-				miAlumnoDAO.registrarAlumno(miAlumnoVO);
-				limpiar();
-			}else{
-				//miCoordinador.modificarAlumno(miAlumno);
-				limpiar();
-			}
+			AlumnoDAO miAlumnoDAO= new AlumnoDAO();
 			
+			if (accion==1){
+				miAlumnoDAO.registrarAlumno(miAlumnoVO);	
+			}else{
+				miAlumnoDAO.modificarAlumno(miAlumnoVO);
+			}
+			limpiar();
 		} catch (Exception e){
 			JOptionPane.showMessageDialog(null, "Error en el ingreso de datos","Error",JOptionPane.ERROR_MESSAGE);
 			limpiar();
@@ -210,6 +238,28 @@ public class VentanaAlumno extends JFrame {
 		btnEliminar.setEnabled(bEliminar);
 		btnBuscar.setEnabled(bBuscar);
 		btnCancelar.setEnabled(bCancelar);
+	}
+
+	public void mostrarDatos(AlumnoVO miAlumnoVO) {
+		SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+		Date miDia = new Date();
+		GregorianCalendar miGCalendar = new GregorianCalendar();
+		try {
+			miDia = formato.parse(miAlumnoVO.getFecha());
+		}catch (ParseException e) {
+			e.printStackTrace();
+		}
+		miGCalendar.setTime(miDia);
+		txtDni.setText(String.valueOf(miAlumnoVO.getDni()));
+		txtApe.setText(miAlumnoVO.getApe());
+		selectorFecha.setCalendar(miGCalendar);
+		
+		if (miAlumnoVO.getDoc()==0)
+			chkDoc.setSelected(false);
+		else
+			chkDoc.setSelected(true);
+		
+		habilita(false, false, false, false, false, false, true, true, false, true);
 	}
 	
 }

@@ -2,6 +2,8 @@ package vista;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,6 +15,9 @@ import javax.swing.table.DefaultTableModel;
 
 import controlador.Coordinador;
 import modelo.AlumnoDAO;
+import modelo.AlumnoVO;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class VentanaAlumnoBuscar extends JFrame {
 
@@ -49,7 +54,7 @@ public class VentanaAlumnoBuscar extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaAlumnoBuscar() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -60,15 +65,27 @@ public class VentanaAlumnoBuscar extends JFrame {
 		contentPane.add(panel, BorderLayout.SOUTH);
 		
 		JButton btnVolver = new JButton("Volver");
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
 		panel.add(btnVolver);
 		
 		scrollPane = new JScrollPane();
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 	}
 
-	public void cargarDatos() {
+	public void cargarDatos(int dni) {
 		DefaultTableModel modelo = new DefaultTableModel();
 		tabla = new JTable();
+		tabla.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				miCoordinador.pasarDatosAlumno(pasarDatos(e));
+			}
+		});
+		
 		tabla.setModel(modelo);
 		modelo.addColumn("Dni");
 		modelo.addColumn("Apellido");
@@ -78,7 +95,25 @@ public class VentanaAlumnoBuscar extends JFrame {
 		AlumnoDAO miAlumnoDAO = new AlumnoDAO();
 		miAlumnoDAO.buscarAlumnos(modelo);
 		
+		//miAlumnoDAO.buscarParcialDni(modelo,dni);
+		
 		scrollPane.setViewportView(tabla);
+	}
+
+	protected AlumnoVO pasarDatos(MouseEvent e) {
+		AlumnoVO miAlumnoVO = new AlumnoVO();
+		int fila=tabla.rowAtPoint(e.getPoint());
+		miAlumnoVO.setDni(Integer.valueOf(tabla.getValueAt(fila, 0).toString()));
+		miAlumnoVO.setApe(tabla.getValueAt(fila, 1).toString());
+		miAlumnoVO.setFecha(tabla.getValueAt(fila, 2).toString());
+		String estado = tabla.getValueAt(fila, 3).toString();
+		//miAlumnoVO.setDoc(Byte.valueOf(tabla.getValueAt(fila, 3).toString()));
+		if (estado.equals("false")) {
+			miAlumnoVO.setDoc((byte) 0);
+		}else {
+			miAlumnoVO.setDoc((byte) 1);
+		}
+		return miAlumnoVO;
 	}
 
 }
